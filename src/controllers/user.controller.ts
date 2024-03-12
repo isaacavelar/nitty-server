@@ -19,7 +19,7 @@ export class UserController {
                 title: 'Erro ao criar o Usuario'
             }
             
-            ctx.body = error
+            ctx.body = { error }
             ctx.status = 409;
             return;
         }
