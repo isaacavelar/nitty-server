@@ -15,7 +15,7 @@ export class Routes {
         router.use(Auth.autenticateMiddleware)
 
         AuthRouter.routes(loginRouter);
-        UserRouter.routes(loginRouter);
+        UserRouter.routes(router);
 
         server.use(loginRouter.routes()).use(loginRouter.allowedMethods());
         server.use(router.routes()).use(router.allowedMethods());

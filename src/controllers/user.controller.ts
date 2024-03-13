@@ -1,10 +1,16 @@
-// import { NittyContext as Context } from '../server';
 import userModel from '../models/user.model';
 import { DefaultError } from '../interfaces/error.interface';
 import { CreateUserPayload } from '../interfaces/user.interface';
 import { Context } from 'koa';
+import "../server/index.d.ts";
 
 export class UserController {
+    public static async authenticatedUser(ctx: Context, nex: Function) {
+        const user = ctx.user;
+
+        ctx.body = user;
+    }
+
     public static async createUser(ctx: Context, next: Function) {
         const data: CreateUserPayload = ctx.request.body;
 

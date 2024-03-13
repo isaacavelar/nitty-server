@@ -1,6 +1,5 @@
 import { DefaultError } from "../interfaces/error.interface";
 import { User } from "../models/user.model";
-import Koa, { Context } from 'koa'
 
 declare module "koa" {
     interface BaseContext {
