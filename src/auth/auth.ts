@@ -39,9 +39,10 @@ export class Auth {
         const secret = process.env.JWT_SECRET as string;
         const refreshSecret = process.env.JWT_REFRESH as string;
         const expiresIn = 60 * 60 * 5;
+
         
         const token = jwt.sign({id: user._id.toString()}, secret, { expiresIn: expiresIn });
-        const refreshToken = jwt.sign({id: user._id.toString()}, refreshSecret);
+        const refreshToken = jwt.sign({id: user._id.toString()}, refreshSecret, { expiresIn: expiresIn * 2 });
 
         ctx.user = user;
         
@@ -53,30 +54,29 @@ export class Auth {
     }
 
     public static async refreshToken(ctx: Context, next: Function) {
-        const { token, userId } = ctx.request.body;
+        const { token } = ctx.request.body;
         const refreshSecret = process.env.JWT_REFRESH as string;
 
         try {
             const decode = jwt.verify(token, refreshSecret) as AuthJwtDecode;
+            const user = await userModel.findById(decode.id) as User;
 
-            if (decode.id != userId) {
-                const error = {
-                    title: 'Falha na autenticação.',
-                    description: 'Falha na autenticação. RefreshToken invalido'
+            if (!user) {
+                const error: DefaultError = {
+                    description: 'Falha na autenticação. Por favor, refaça o login.',
+                    title: 'Sessão expirada.'
                 }
-
+    
                 ctx.body = { error }
                 ctx.status = 401;
                 return;
             }
 
-            const user = await userModel.findById(userId) as User;
-
             const secret = process.env.JWT_SECRET as string;
             const expiresIn = 60 * 60 * 5;
             
             const newToken = jwt.sign({id: user._id.toString()}, secret, { expiresIn: expiresIn });
-            const newRefreshToken = jwt.sign({id: user._id.toString()}, refreshSecret);
+            const newRefreshToken = jwt.sign({id: user._id.toString()}, refreshSecret, { expiresIn: expiresIn * 2 });
     
             ctx.user = user;
     
@@ -93,10 +93,7 @@ export class Auth {
 
             ctx.body = { error }
             ctx.status = 401;
-            return;
         }
-        
-
     }
 
     public static async autenticateMiddleware (ctx: Context, next: Function) {
@@ -119,7 +116,6 @@ export class Auth {
             const user = await userModel.findById(decode.id).lean() as User;
 
             ctx.user = user;    
-        
             await next();
         } catch (err) { 
             const error = {
