@@ -3,13 +3,20 @@ import { db } from "../connections/mongodb";
 
 export interface Topic {
     title: string;
-    words: string[];
+    words: {
+        word: string;
+        translation: string;
+    }[];
 }
 
 const schema = new Schema(
     {
         title: String,
-        words: [String]
+        words: [{
+            word: String,
+            translation: String
+
+        }]
     }
 )
 

@@ -1,16 +1,9 @@
 import { Schema } from "mongoose";
 import { db } from "../connections/mongodb";
 import { User } from "./user.model";
+import { Words } from "../interfaces/words.interface";
 
-interface Words {
-    word: string;
-    currentDifficulty: 'very easy' | 'easy' | 'medium' | 'hard' | 'very hard';
-    qtdConsecutiveCorrectGuesses: number;
-    qtdConsecutiveVeryEasy: number;
-    status: number;
-}
-
-export interface Activitie {
+export interface Task {
     name: string;
     progress: number;
     user: User;
@@ -30,7 +23,8 @@ const schema = new Schema(
             currentDifficulty: String,
             qtdConsecutiveCorrectGuesses: Number,
             qtdConsecutiveVeryEasy: Number,
-            status: Number
+            status: Number,
+            translation: String
         }
     },
     {
@@ -44,4 +38,4 @@ const schema = new Schema(
     },
 )
 
-export default db.model<Activitie>('activities', schema, 'activities')
+export default db.model<Task>('activities', schema, 'activities')

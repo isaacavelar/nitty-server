@@ -3,6 +3,7 @@ import koa from 'koa';
 import { UserRouter } from './user.router';
 import { AuthRouter } from './auth.router';
 import { Auth } from '../auth/auth';
+import { TopicRouter } from './topic.router';
 
 export class Routes {
     static init(server: koa) {
@@ -16,6 +17,7 @@ export class Routes {
 
         AuthRouter.routes(loginRouter);
         UserRouter.routes(router);
+        TopicRouter.routes(router);
 
         server.use(loginRouter.routes()).use(loginRouter.allowedMethods());
         server.use(router.routes()).use(router.allowedMethods());
