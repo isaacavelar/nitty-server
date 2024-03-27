@@ -4,10 +4,6 @@ import { DefaultError } from '../interfaces/error.interface.js';
 import { CreateTaskPayload } from '../interfaces/task.interface.js';
 import topicsModel from '../models/topic.model.js';
 import { Words } from '../interfaces/words.interface.js';
-import dayjs from "dayjs";
-import utc from 'dayjs/plugin/utc';
-import timezone from 'dayjs/plugin/timezone';
-
 export class TaskController {
     public static async findUserTasks(ctx: Context, next: Function) {
         const user = ctx.user;
