@@ -6,6 +6,9 @@ import { Words } from "../interfaces/words.interface";
 export interface Task {
     name: string;
     progress: number;
+    status:    number;
+    startDate: string;
+    completionDate: string;
     user: User;
     words: Words[]
 }
@@ -14,6 +17,9 @@ const schema = new Schema(
     {
         name: String,
         progress: Number,
+        status: Number,
+        startDate: String,
+        completionDate: String,
         user: {
             type: Schema.Types.ObjectId,
             ref: 'user'

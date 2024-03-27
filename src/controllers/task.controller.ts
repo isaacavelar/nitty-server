@@ -4,6 +4,9 @@ import { DefaultError } from '../interfaces/error.interface.js';
 import { CreateTaskPayload } from '../interfaces/task.interface.js';
 import topicsModel from '../models/topic.model.js';
 import { Words } from '../interfaces/words.interface.js';
+import dayjs from "dayjs";
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
 
 export class TaskController {
     public static async findUserTasks(ctx: Context, next: Function) {
@@ -11,7 +14,10 @@ export class TaskController {
         try {
             const task = await taskModel.find({
                 user: user._id
-            });
+            })
+            .sort({ createdAt: -1 })
+            .select('-createdAt -updatedAt -__v')
+            .lean();
 
             ctx.body = task;
         } catch (err) {
@@ -28,6 +34,7 @@ export class TaskController {
     public static async createTask(ctx: Context, next: Function) {
         const { topicId }: CreateTaskPayload = ctx.request.body;
         const user = ctx.user;
+        const date = ctx.date;
 
         const topic = await topicsModel.findById(topicId).lean();
 
@@ -56,13 +63,17 @@ export class TaskController {
         try {
             const createdtask = await taskModel.create({
                 name: topic.title,
-                progress: 0,
+                progress: 0,  
+                status: 0,
+                startDate: date,
+                completionDate: '',
                 user: user._id,
                 words: words
             });
 
             ctx.body = { message: 'Atividade criada com sucesso', task: createdtask }
         } catch (err)  {
+            console.log(err);
             const error: DefaultError = {
                 title: 'Não foi possivel cirar sua atividade',
                 description: 'Erro ao comunicar com o servidor, por favor tente novamente mais tarde.'
@@ -74,7 +85,7 @@ export class TaskController {
     }
 
     public static async findNextWords(ctx: Context, next: Function) {
-        const { taskId, qtdWords } = ctx.request.body;
+        const { taskId, qtdWords } = ctx.query;
 
         try {
             const task = await taskModel.findById(taskId);
@@ -91,8 +102,12 @@ export class TaskController {
             }
 
             const words = task.words.filter(word => {
-                return word.status === 0
-            }).slice(0, qtdWords || 30);
+                return (
+                    word.status === 0 &&
+                    word.qtdConsecutiveCorrectGuesses < 5 &&   
+                    word.currentDifficulty != 'very easy'
+                )
+            }).slice(0, Number(qtdWords || 30));
 
             ctx.body = { words }
         } catch (err) {

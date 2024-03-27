@@ -16,3 +16,4 @@ services:
       NODE_ENV: ${NODE_ENV}
       SERVER_PORT: ${SERVER_PORT}
       URL_CLUSTER: ${URL_CLUSTER}
+      TZ: America/Sao_Paulo
