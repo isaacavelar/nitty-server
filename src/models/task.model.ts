@@ -18,14 +18,14 @@ const schema = new Schema(
             type: Schema.Types.ObjectId,
             ref: 'user'
         },
-        words: {
+        words: [{
             word: String,
             currentDifficulty: String,
             qtdConsecutiveCorrectGuesses: Number,
             qtdConsecutiveVeryEasy: Number,
             status: Number,
             translation: String
-        }
+        }]
     },
     {
         timestamps: true,
@@ -38,4 +38,4 @@ const schema = new Schema(
     },
 )
 
-export default db.model<Task>('activities', schema, 'activities')
+export default db.model<Task>('task', schema, 'tasks')

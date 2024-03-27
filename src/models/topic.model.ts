@@ -17,7 +17,16 @@ const schema = new Schema(
             translation: String
 
         }]
-    }
+    },
+    {
+        timestamps: true,
+        toObject: {
+            virtuals: true,
+        },
+        toJSON: {
+            virtuals: true,
+        },
+    },
 )
 
 export default db.model<Topic>('topic', schema, 'topics')

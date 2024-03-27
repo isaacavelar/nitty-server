@@ -1,5 +1,4 @@
 import { Context } from 'koa';
-import "../server/index.js";
 import taskModel from '../models/task.model.js';
 import { DefaultError } from '../interfaces/error.interface.js';
 import { CreateTaskPayload } from '../interfaces/task.interface.js';
@@ -7,7 +6,7 @@ import topicsModel from '../models/topic.model.js';
 import { Words } from '../interfaces/words.interface.js';
 
 export class TaskController {
-    public static async findAllTasks(ctx: Context, next: Function) {
+    public static async findUserTasks(ctx: Context, next: Function) {
         const user = ctx.user;
         try {
             const task = await taskModel.find({
@@ -52,7 +51,7 @@ export class TaskController {
                 status: 0,
                 translation: word.translation
             }
-        })
+        });
 
         try {
             const createdtask = await taskModel.create({
@@ -72,12 +71,38 @@ export class TaskController {
             ctx.body = { error }
             ctx.status = 500;
         }
-
-
-
     }
 
-    public static async findNextWord(ctx: Context, next: Function) {
+    public static async findNextWords(ctx: Context, next: Function) {
+        const { taskId, qtdWords } = ctx.request.body;
 
+        try {
+            const task = await taskModel.findById(taskId);
+
+            if (!task) {
+                const error: DefaultError = {
+                    title: 'Erro',
+                    description: 'Tarefa não encontrada'
+                }
+    
+                ctx.body = { error }
+                ctx.status = 404;
+                return;
+            }
+
+            const words = task.words.filter(word => {
+                return word.status === 0
+            }).slice(0, qtdWords || 30);
+
+            ctx.body = { words }
+        } catch (err) {
+            const error: DefaultError = {
+                title: 'Erro',
+                description: 'Erro ao se conectar com o servidor'
+            }
+
+            ctx.body = { error }
+            ctx.status = 500;
+        }
     }
 }
