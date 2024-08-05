@@ -13,7 +13,6 @@ export class UserController {
     public static async createUser(ctx: Context, next: Function) {
         const data: CreateUserPayload = ctx.request.body;
 
-
         const userAlreadyExist = await userModel.findOne({
             email: data.email
         }).lean();
